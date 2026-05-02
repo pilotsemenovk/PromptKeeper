@@ -1,0 +1,34 @@
+# Build and temporary files
+_build.py
+_make_final.py
+_prompts_cand.txt
+_tg_extracted.txt
+_tools_cand.json
+_tools_cand2.txt
+_unknown.txt
+icon128.ico
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Node modules (if applicable)
+node_modules/
+npm-debug.log*
+
+# Environment variables
+.env
+.env.local
+
+# OS-specific
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db

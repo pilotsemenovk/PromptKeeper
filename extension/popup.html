@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>PromptKeeper</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<header>
+  <div class="logo">PromptKeeper</div>
+  <button id="settings-btn" title="Настройки">⚙</button>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="prompts">Промпты</button>
+  <button class="tab" data-tab="tools">Нейросети</button>
+  <button class="tab" data-tab="import">Импорт</button>
+</nav>
+
+<section id="tab-prompts" class="tab-panel active">
+  <div class="search-row">
+    <input id="search-prompts" placeholder="Поиск по базе промптов">
+    <button id="ai-search-prompts" title="Найти через ИИ">ИИ</button>
+  </div>
+  <div class="actions-row">
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button id="add-prompt">＋ Добавить</button>
+      <button id="clear-prompts" class="danger-ghost" title="Удалить все промпты">Очистить всё</button>
+    </div>
+    <span class="counter" id="cnt-prompts">0</span>
+  </div>
+  <div id="prompts-list" class="list"></div>
+</section>
+
+<section id="tab-tools" class="tab-panel">
+  <div class="search-row">
+    <input id="search-tools" placeholder="Что хочу сделать?">
+    <button id="ai-search-tools" title="Подобрать нейросеть через ИИ">ИИ</button>
+  </div>
+  <div class="actions-row">
+    <button id="add-tool">＋ Добавить нейросеть</button>
+    <span class="counter" id="cnt-tools">0</span>
+  </div>
+  <div id="tools-list" class="list"></div>
+</section>
+
+<section id="tab-import" class="tab-panel">
+  <h3>Импорт из текста.</h3>
+  <p class="hint">Вставь любой текст — ИИ найдёт промпты и нейросети и добавит в базу.</p>
+  <textarea id="import-text" rows="6" placeholder="Вставь переписку из тг или любой текст"></textarea>
+  <div class="row">
+    <label><input type="radio" name="imp-mode" value="prompts" checked> Промпты</label>
+    <label><input type="radio" name="imp-mode" value="tools"> Нейросети</label>
+    <label><input type="radio" name="imp-mode" value="both"> Всё что найдёт</label>
+  </div>
+  <button id="ai-import" class="primary">Распарсить через ИИ</button>
+  <div id="import-result" class="result"></div>
+
+  <hr>
+  <h3>База в JSON-файле</h3>
+  <p class="hint">Сохрани всю базу в один JSON-файл на диск. Этот файл потом можно загрузить обратно или открыть в веб-приложении.</p>
+  <div class="row">
+    <button id="export-all" class="primary">Сохранить базу в JSON</button>
+    <button id="import-json">Загрузить из JSON</button>
+    <input type="file" id="import-file" accept=".json" hidden>
+  </div>
+</section>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-card">
+    <button class="close" id="modal-close">×</button>
+    <h3 id="modal-title">Добавить</h3>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>

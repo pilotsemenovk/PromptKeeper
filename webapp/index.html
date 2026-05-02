@@ -1,0 +1,1116 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>PromptKeeper</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/png" href="icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --apple-bg-white: #FFFFFF;
+  --apple-bg-dark: #1D1D1F;
+  --apple-bg-light-gray: #F5F5F7;
+  --apple-bg-elevated: #FBFBFD;
+  --apple-text-primary: #1D1D1F;
+  --apple-text-secondary: #6E6E73;
+  --apple-text-tertiary: #86868B;
+  --apple-link-blue: #0066CC;
+  --apple-link-blue-hover: #0077ED;
+  --apple-accent-green: #2D8C3C;
+  --apple-accent-red: #E30000;
+  --apple-radius-card: 18px;
+  --apple-radius-card-sm: 12px;
+  --apple-radius-button: 980px;
+  --apple-radius-badge: 8px;
+  --apple-shadow-card: 0 2px 8px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.08);
+  --apple-shadow-hover: 0 4px 12px rgba(0,0,0,.06), 0 12px 32px rgba(0,0,0,.12);
+  --apple-shadow-modal: 0 8px 20px rgba(0,0,0,.08), 0 20px 60px rgba(0,0,0,.16);
+  --apple-gradient-text-purple: linear-gradient(90deg, #7B2FBE, #E040A0);
+  --apple-gradient-bg-light: linear-gradient(180deg, #FBFBFD 0%, #F5F5F7 100%);
+  --apple-font-display: 'SF Pro Display','Inter','Helvetica Neue','Arial',sans-serif;
+  --apple-font-text: 'SF Pro Text','Inter','Helvetica Neue','Arial',sans-serif;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; font: 17px/1.53 var(--apple-font-text);
+  color: var(--apple-text-primary); background: var(--apple-bg-white);
+  -webkit-font-smoothing: antialiased;
+}
+
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(251,251,253,.8);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+.topbar-inner {
+  max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+}
+.brand { font-family: var(--apple-font-display); font-weight: 600; font-size: 18px; letter-spacing: -0.015em; }
+.topbar .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.topbar .actions button {
+  background: var(--apple-bg-light-gray); color: var(--apple-text-primary); border: 0;
+  padding: 8px 16px; border-radius: var(--apple-radius-button);
+  cursor: pointer; font: 500 13px var(--apple-font-text); transition: background .2s;
+}
+.topbar .actions button:hover { background: #E8E8ED; }
+.topbar .actions button.linked { background: #DCFCE7; color: var(--apple-accent-green); }
+.topbar .actions .file-status {
+  font-size: 12px; color: var(--apple-text-secondary);
+  max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.topbar .actions .file-status.linked { color: var(--apple-accent-green); font-weight: 500; }
+
+.hero {
+  background: var(--apple-gradient-bg-light); text-align: center;
+  padding: 80px 24px 60px; border-bottom: 1px solid rgba(0,0,0,.06);
+}
+.hero h1 {
+  font-family: var(--apple-font-display);
+  font-size: 48px; font-weight: 700;
+  line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 12px;
+}
+.hero h1 .gradient {
+  background: var(--apple-gradient-text-purple);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p {
+  font-size: 21px; font-weight: 400; color: var(--apple-text-secondary);
+  max-width: 640px; margin: 0 auto; line-height: 1.4;
+}
+@media (min-width: 734px)  { .hero h1 { font-size: 56px; } }
+@media (min-width: 1068px) { .hero h1 { font-size: 72px; } .hero { padding: 110px 24px 80px; } }
+
+nav.tabs {
+  display: flex; justify-content: center; gap: 4px;
+  background: var(--apple-bg-white);
+  padding: 16px 24px 0; border-bottom: 1px solid rgba(0,0,0,.08);
+  position: sticky; top: 56px; z-index: 40;
+}
+nav.tabs button {
+  background: none; border: 0; color: var(--apple-text-secondary);
+  padding: 12px 22px 14px; cursor: pointer;
+  font: 500 15px var(--apple-font-text);
+  border-bottom: 2px solid transparent;
+  transition: color .2s, border-color .2s;
+}
+nav.tabs button:hover { color: var(--apple-text-primary); }
+nav.tabs button.active {
+  color: var(--apple-text-primary); border-bottom-color: var(--apple-text-primary); font-weight: 600;
+}
+
+main { max-width: 1200px; margin: 0 auto; padding: 48px 24px 80px; }
+
+.search-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.search-bar input {
+  flex: 1; min-width: 240px;
+  background: var(--apple-bg-light-gray); color: var(--apple-text-primary);
+  border: 1px solid transparent; border-radius: var(--apple-radius-button);
+  padding: 13px 22px; font: 15px var(--apple-font-text);
+  transition: background .2s, border-color .2s, box-shadow .2s;
+}
+.search-bar input::placeholder { color: var(--apple-text-tertiary); }
+.search-bar input:focus {
+  outline: 0; background: var(--apple-bg-white);
+  border-color: var(--apple-link-blue); box-shadow: 0 0 0 4px rgba(0,102,204,.12);
+}
+.search-bar button, button.primary {
+  background: var(--apple-link-blue); color: #fff; border: 0;
+  padding: 13px 24px; border-radius: var(--apple-radius-button);
+  cursor: pointer; font: 500 14px var(--apple-font-text);
+  transition: background .2s, transform .15s;
+}
+.search-bar button:hover, button.primary:hover { background: var(--apple-link-blue-hover); }
+.search-bar button:active, button.primary:active { transform: scale(.97); }
+
+button.ghost {
+  background: var(--apple-bg-light-gray); color: var(--apple-text-primary);
+  border: 0; padding: 10px 18px; border-radius: var(--apple-radius-button);
+  cursor: pointer; font: 500 13px var(--apple-font-text);
+  transition: background .2s;
+}
+button.ghost:hover { background: #E8E8ED; }
+button.ghost.danger-ghost { color: var(--apple-accent-red); }
+button.ghost.danger-ghost:hover { background: #FFEBEB; }
+
+.tools-row { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+.counter { color: var(--apple-text-tertiary); font-size: 14px; margin-left: auto; }
+
+.grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.card {
+  background: var(--apple-bg-white);
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: var(--apple-radius-card);
+  padding: 24px; cursor: pointer; position: relative;
+  transition: box-shadow .3s, transform .3s, border-color .2s;
+}
+.card:hover {
+  box-shadow: var(--apple-shadow-hover);
+  transform: translateY(-3px); border-color: rgba(0,0,0,.04);
+}
+.card .title {
+  font-family: var(--apple-font-display); font-weight: 600;
+  font-size: 17px; letter-spacing: -0.015em; line-height: 1.1;
+  margin-bottom: 8px; padding-right: 32px;
+  display: flex; justify-content: space-between; gap: 10px; align-items: flex-start;
+}
+.card .meta { color: var(--apple-text-tertiary); font-size: 12px; margin-bottom: 6px; }
+.card .text {
+  color: var(--apple-text-secondary); font-size: 14px; line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card a { color: var(--apple-link-blue); text-decoration: none; font-size: 13px; font-weight: 500; }
+.card a:hover { color: var(--apple-link-blue-hover); text-decoration: underline; }
+.card .del {
+  position: absolute; top: 12px; right: 12px;
+  background: transparent; border: 0; color: var(--apple-text-tertiary);
+  width: 28px; height: 28px; border-radius: 50%;
+  font-size: 18px; line-height: 1; cursor: pointer; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s, color .2s; opacity: 0;
+}
+.card:hover .del { opacity: 1; }
+.card .del:hover { background: #FFEBEB; color: var(--apple-accent-red); }
+
+.tags { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  background: var(--apple-bg-light-gray); color: var(--apple-text-secondary);
+  padding: 4px 11px; border-radius: var(--apple-radius-badge);
+  font-size: 12px; font-weight: 500;
+}
+.score {
+  background: var(--apple-link-blue); color: #fff;
+  padding: 3px 9px; border-radius: var(--apple-radius-badge);
+  font-size: 11px; font-weight: 600; flex-shrink: 0;
+}
+
+.empty {
+  text-align: center; color: var(--apple-text-tertiary);
+  padding: 80px 20px; font-size: 15px; line-height: 1.5;
+  grid-column: 1 / -1;
+}
+
+.modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,.4);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  display: none; align-items: center; justify-content: center;
+  z-index: 100; padding: 20px;
+}
+.modal.show { display: flex; }
+.modal-card {
+  background: var(--apple-bg-white); border-radius: 20px;
+  padding: 32px; width: 100%; max-width: 560px;
+  max-height: 90vh; overflow-y: auto;
+  position: relative; box-shadow: var(--apple-shadow-modal);
+}
+.modal-card .close {
+  position: absolute; top: 14px; right: 16px;
+  background: var(--apple-bg-light-gray); border: 0;
+  color: var(--apple-text-secondary);
+  width: 32px; height: 32px; border-radius: 50%;
+  font-size: 18px; cursor: pointer;
+}
+.modal-card h2 {
+  font-family: var(--apple-font-display);
+  font-size: 24px; font-weight: 600; letter-spacing: -0.015em;
+  margin: 0 0 16px;
+}
+
+label {
+  display: block; margin-top: 16px;
+  font-size: 11px; font-weight: 600; color: var(--apple-text-secondary);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+input[type=text], input[type=url], input[type=password], textarea {
+  width: 100%; padding: 11px 14px; border-radius: var(--apple-radius-card-sm);
+  border: 1px solid rgba(0,0,0,.12);
+  background: var(--apple-bg-white); color: var(--apple-text-primary);
+  font: 15px var(--apple-font-text); margin-top: 6px;
+  transition: border-color .2s, box-shadow .2s;
+}
+input:focus, textarea:focus {
+  outline: 0; border-color: var(--apple-link-blue);
+  box-shadow: 0 0 0 3px rgba(0,102,204,.15);
+}
+textarea { resize: vertical; font-family: inherit; line-height: 1.5; }
+
+.modal-actions {
+  display: flex; gap: 10px; justify-content: flex-end;
+  margin-top: 24px; flex-wrap: wrap;
+}
+button.danger {
+  background: #FFEBEB; color: var(--apple-accent-red); border: 0;
+  padding: 10px 18px; border-radius: var(--apple-radius-button);
+  cursor: pointer; font: 500 13px var(--apple-font-text);
+}
+button.danger:hover { background: #FFDADA; }
+
+.panel { display: none; animation: fade .25s ease; }
+.panel.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(8px); } }
+
+.import-box {
+  background: var(--apple-bg-light-gray); border-radius: var(--apple-radius-card);
+  padding: 32px; margin-bottom: 16px;
+}
+.import-box h3 {
+  margin: 0 0 8px; font-family: var(--apple-font-display);
+  font-size: 28px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.1;
+}
+.hint { color: var(--apple-text-secondary); font-size: 15px; line-height: 1.5; }
+.result-box {
+  margin-top: 16px; padding: 16px;
+  background: var(--apple-bg-white); border-radius: var(--apple-radius-card-sm);
+  max-height: 280px; overflow-y: auto;
+  font: 13px/1.5 'SF Mono', ui-monospace, Menlo, monospace;
+  white-space: pre-wrap; color: var(--apple-text-secondary);
+  border: 1px solid rgba(0,0,0,.08);
+}
+.row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+.row label.radio {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--apple-text-primary); font-size: 14px; cursor: pointer;
+  text-transform: none; letter-spacing: 0; font-weight: 400; margin-top: 0;
+}
+hr { border: 0; border-top: 1px solid rgba(0,0,0,.08); margin: 24px 0; }
+a { color: var(--apple-link-blue); }
+
+.toast {
+  position: fixed; bottom: 32px; right: 32px;
+  background: var(--apple-bg-dark); color: #fff;
+  padding: 14px 22px; border-radius: var(--apple-radius-button);
+  font: 500 14px var(--apple-font-text);
+  z-index: 1000; box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  animation: slidein .3s cubic-bezier(.2,.8,.2,1);
+}
+.toast.error { background: var(--apple-accent-red); }
+@keyframes slidein { from { transform: translateY(20px); opacity: 0; } }
+
+footer {
+  background: var(--apple-bg-light-gray); padding: 32px 24px;
+  text-align: center; color: var(--apple-text-tertiary);
+  font-size: 12px; border-top: 1px solid rgba(0,0,0,.06);
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">PromptKeeper</div>
+    <div class="actions">
+      <span id="file-status" class="file-status"></span>
+      <button id="bind-file-btn" title="Связать с JSON-файлом для автосохранения">Связать с файлом</button>
+      <button id="settings-btn">Настройки ИИ</button>
+      <button id="export-btn">Экспорт</button>
+      <button id="import-btn">Импорт JSON</button>
+      <button id="reload-base-btn" title="Загрузить базовые промпты и нейросети">Загрузить базу</button>
+      <input type="file" id="import-file" accept=".json" hidden>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <h1>Твоя база <span class="gradient">промптов</span>.<br>И нейросетей.</h1>
+  <p>Сохраняй. Ищи. Находи. Локально, с ИИ.</p>
+</section>
+
+<nav class="tabs">
+  <button class="active" data-panel="prompts">Промпты</button>
+  <button data-panel="tools">Нейросети</button>
+  <button data-panel="ai-import">ИИ-импорт</button>
+</nav>
+
+<main>
+
+<section class="panel active" id="panel-prompts">
+  <div class="search-bar">
+    <input id="search-prompts" placeholder="Поиск свободным текстом — или ИИ-поиск справа">
+    <button id="ai-search-prompts">ИИ-поиск</button>
+  </div>
+  <div class="tools-row">
+    <button class="ghost" id="add-prompt">Добавить промпт</button>
+    <button class="ghost" id="reset-prompts">Сбросить поиск</button>
+    <button class="ghost danger-ghost" id="clear-prompts">Очистить всё</button>
+    <span class="counter" id="cnt-prompts">0 промптов</span>
+  </div>
+  <div class="grid" id="prompts-grid"></div>
+</section>
+
+<section class="panel" id="panel-tools">
+  <div class="search-bar">
+    <input id="search-tools" placeholder="Что хочешь сделать? Например: убрать вотермарк с видео">
+    <button id="ai-search-tools">Подобрать нейросеть</button>
+  </div>
+  <div class="tools-row">
+    <button class="ghost" id="add-tool">Добавить нейросеть</button>
+    <button class="ghost" id="seed-tools">Загрузить стартовую базу</button>
+    <button class="ghost" id="reset-tools">Сбросить поиск</button>
+    <span class="counter" id="cnt-tools">0 нейросетей</span>
+  </div>
+  <div class="grid" id="tools-grid"></div>
+</section>
+
+<section class="panel" id="panel-ai-import">
+  <div class="import-box">
+    <h3>ИИ-импорт из текста.</h3>
+    <p class="hint">Вставь переписку из Telegram, статью или заметку. ИИ найдёт промпты и ссылки на нейросети и добавит в базу.</p>
+    <textarea id="import-text" rows="8" placeholder="Вставь сюда переписку из тг или любой текст"></textarea>
+    <div class="row" style="margin-top:10px">
+      <label class="radio"><input type="radio" name="ai-mode" value="prompts" checked> Промпты</label>
+      <label class="radio"><input type="radio" name="ai-mode" value="tools"> Нейросети</label>
+      <label class="radio"><input type="radio" name="ai-mode" value="both"> Всё что найдёт</label>
+      <button class="primary" id="ai-import-btn" style="margin-left:auto">Распарсить через ИИ</button>
+    </div>
+    <div class="result-box" id="ai-import-result" hidden></div>
+  </div>
+
+  <div class="import-box">
+    <h3>База в одном JSON-файле.</h3>
+    <p class="hint">Привяжи базу к JSON-файлу на диске — изменения будут сохраняться в него автоматически. Идеально для бэкапа в Dropbox, Google Drive или просто на флешку.</p>
+    <div class="row" style="margin-top:14px">
+      <button class="primary" id="bind-file-btn-2">Выбрать или создать JSON-файл</button>
+      <button class="ghost" id="unbind-file-btn">Отвязать</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  PromptKeeper — локальная база промптов и нейросетей.
+</footer>
+
+<div class="modal" id="settings-modal">
+  <div class="modal-card">
+    <button class="close" data-close>×</button>
+    <h2>Подключение ИИ</h2>
+    <p class="hint">Используется <b>OpenRouter</b> с бесплатной Llama 3.3 70B — работает в любом регионе, отлично с русским. Ключ — на <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a> (вход через Google → «Create Key», карта не нужна).</p>
+    <label>OpenRouter API ключ</label>
+    <input type="password" id="api-key" placeholder="sk-or-v1-...">
+    <p class="hint" style="margin-top:8px">Ключ хранится только в браузере, отправляется лишь на openrouter.ai.</p>
+    <div class="modal-actions">
+      <button class="ghost" data-close>Отмена</button>
+      <button class="primary" id="save-key">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="item-modal">
+  <div class="modal-card">
+    <button class="close" data-close>×</button>
+    <h2 id="item-title">Элемент</h2>
+    <div id="item-body"></div>
+  </div>
+</div>
+
+<script src="bundled-data.js"></script>
+<script>
+// ===== STORAGE: IndexedDB =====
+const DB_NAME = 'promptkeeper'; const DB_VERSION = 1;
+let db, fileHandle = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('prompts')) d.createObjectStore('prompts', {keyPath:'id'});
+      if (!d.objectStoreNames.contains('tools'))   d.createObjectStore('tools',   {keyPath:'id'});
+      if (!d.objectStoreNames.contains('config'))  d.createObjectStore('config',  {keyPath:'key'});
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+function tx(store, mode='readonly') { return db.transaction(store, mode).objectStore(store); }
+function getAll(store) { return new Promise(r => { const q = tx(store).getAll(); q.onsuccess = () => r(q.result || []); }); }
+function put(store, obj) { return new Promise((r,j) => { const q = tx(store,'readwrite').put(obj); q.onsuccess=()=>r(); q.onerror=()=>j(q.error); }); }
+function del(store, id) { return new Promise(r => { tx(store,'readwrite').delete(id).onsuccess = () => r(); }); }
+function clearStore(store) { return new Promise(r => { tx(store,'readwrite').clear().onsuccess = () => r(); }); }
+async function getConfig(key) { return new Promise(r => { tx('config').get(key).onsuccess = e => r(e.target.result?.value); }); }
+async function setConfig(key, value) { await put('config', {key, value}); }
+
+// ===== STATE =====
+let state = { prompts: [], tools: [], filtered: {prompts:null, tools:null} };
+
+// ===== UI =====
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+function esc(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtDate(iso) { try { return new Date(iso).toLocaleDateString('ru-RU'); } catch { return ''; } }
+function titleFromText(t) {
+  const s = String(t||'').trim().split(/[\r\n.!?]/)[0].trim();
+  return s.length > 60 ? s.slice(0,60) + '…' : (s || 'промпт');
+}
+function linkify(htmlEscaped) {
+  return String(htmlEscaped||'').replace(/(https?:\/\/[^\s<]+[^\s.,;:!?<\)\]])/g,
+    '<a href="$1" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" style="color:var(--apple-link-blue);text-decoration:underline">$1</a>');
+}
+function toast(msg, ok=true) {
+  const t = document.createElement('div');
+  t.className = 'toast' + (ok ? '' : ' error');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
+}
+
+$$('nav.tabs button').forEach(b => b.addEventListener('click', () => {
+  $$('nav.tabs button').forEach(x => x.classList.remove('active'));
+  $$('.panel').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  $('#panel-' + b.dataset.panel).classList.add('active');
+}));
+
+function renderPrompts() {
+  const list = state.filtered.prompts || state.prompts;
+  $('#cnt-prompts').textContent = list.length + ' промптов';
+  const g = $('#prompts-grid');
+  if (!list.length) { g.innerHTML = '<div class="empty">Пока пусто. Добавь промпт вручную или импортируй JSON / текст.</div>'; return; }
+  g.innerHTML = list.map(p => `
+    <div class="card" data-id="${p.id}">
+      <button class="del" data-del-prompt="${p.id}" title="Удалить">×</button>
+      <div class="title">
+        <span>${esc(titleFromText(p.text))}${p.score?` <span class="score">${p.score}</span>`:''}</span>
+        <span style="font-size:11px;color:#86868B;font-weight:400">${fmtDate(p.createdAt)}</span>
+      </div>
+      ${p.ai?`<div class="meta">${esc(p.ai)}</div>`:''}
+      <div class="text">${linkify(esc(p.text||''))}</div>
+      ${(p.tags||[]).length?`<div class="tags">${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
+    </div>`).join('');
+  g.querySelectorAll('[data-del-prompt]').forEach(b => b.addEventListener('click', async e => {
+    e.stopPropagation();
+    if (!confirm('Удалить этот промпт?')) return;
+    await del('prompts', b.dataset.delPrompt);
+    state.prompts = state.prompts.filter(p => p.id !== b.dataset.delPrompt);
+    if (state.filtered.prompts) state.filtered.prompts = state.filtered.prompts.filter(p => p.id !== b.dataset.delPrompt);
+    renderPrompts(); syncToFile(); toast('Удалено');
+  }));
+  g.querySelectorAll('.card').forEach(c => c.addEventListener('click', () => openPromptView(state.prompts.find(p=>p.id===c.dataset.id))));
+}
+function renderTools() {
+  const list = state.filtered.tools || state.tools;
+  $('#cnt-tools').textContent = list.length + ' нейросетей';
+  const g = $('#tools-grid');
+  if (!list.length) { g.innerHTML = '<div class="empty">База нейросетей пуста. Нажми «Загрузить стартовую базу» или добавь вручную.</div>'; return; }
+  g.innerHTML = list.map(t => `
+    <div class="card" data-id="${t.id}">
+      <button class="del" data-del-tool="${t.id}" title="Удалить">×</button>
+      <div class="title">
+        <span>${esc(t.name)}${t.score?` <span class="score">${t.score}</span>`:''}</span>
+        ${t.url?`<a href="${esc(t.url)}" target="_blank" onclick="event.stopPropagation()">↗</a>`:''}
+      </div>
+      <div class="text">${esc(t.desc||'')}</div>
+      ${(t.tags||[]).length?`<div class="tags">${t.tags.map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</div>`:''}
+      ${t.why?`<div class="meta" style="margin-top:8px;color:var(--apple-link-blue)">${esc(t.why)}</div>`:''}
+    </div>`).join('');
+  g.querySelectorAll('[data-del-tool]').forEach(b => b.addEventListener('click', async e => {
+    e.stopPropagation();
+    if (!confirm('Удалить эту нейросеть?')) return;
+    await del('tools', b.dataset.delTool);
+    state.tools = state.tools.filter(t => t.id !== b.dataset.delTool);
+    if (state.filtered.tools) state.filtered.tools = state.filtered.tools.filter(t => t.id !== b.dataset.delTool);
+    renderTools(); syncToFile(); toast('Удалено');
+  }));
+  g.querySelectorAll('.card').forEach(c => c.addEventListener('click', () => openToolModal(state.tools.find(t=>t.id===c.dataset.id))));
+}
+
+// ===== LOCAL SEARCH =====
+$('#search-prompts').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase().trim();
+  state.filtered.prompts = q ? state.prompts.filter(p =>
+    (p.text||'').toLowerCase().includes(q)
+    || (p.ai||'').toLowerCase().includes(q)
+    || (p.tags||[]).join(' ').toLowerCase().includes(q)) : null;
+  renderPrompts();
+});
+$('#search-tools').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase().trim();
+  state.filtered.tools = q ? state.tools.filter(t =>
+    (t.name||'').toLowerCase().includes(q)
+    || (t.desc||'').toLowerCase().includes(q)
+    || (t.tags||[]).join(' ').toLowerCase().includes(q)) : null;
+  renderTools();
+});
+$('#reset-prompts').onclick = () => { $('#search-prompts').value=''; state.filtered.prompts=null; renderPrompts(); };
+$('#reset-tools').onclick   = () => { $('#search-tools').value='';   state.filtered.tools=null;   renderTools(); };
+
+$('#clear-prompts').onclick = async () => {
+  if (!state.prompts.length) return;
+  if (!confirm(`Удалить ВСЕ ${state.prompts.length} промптов? Действие нельзя отменить.`)) return;
+  await clearStore('prompts');
+  state.prompts = []; state.filtered.prompts = null;
+  renderPrompts(); syncToFile(); toast('Все промпты удалены');
+};
+
+// ===== AI =====
+async function isOllamaAvailable() {
+  try {
+    const r = await fetch('http://localhost:11434/api/tags', {method:'GET'});
+    return r.ok;
+  } catch { return false; }
+}
+
+async function callOllama(sys, usr, json=true) {
+  const prompt = sys + '\n\n' + usr;
+  const body = {
+    model: 'gemma:2b',
+    prompt,
+    stream: false,
+    options: {temperature: 0.2}
+  };
+  if (json) body.format = 'json';
+  const r = await fetch('http://localhost:11434/api/generate', {
+    method:'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error('Ollama '+r.status);
+  const j = await r.json();
+  const content = (j.response || '').trim();
+  if (!json) return content;
+  try { return JSON.parse(content); }
+  catch {
+    const m = content.match(/\{[\s\S]*\}/);
+    if (m) {
+      try { return JSON.parse(m[0]); } catch {}
+    }
+    // Last resort: wrap content as 'clean' field for prompt-cleaning use case
+    return {clean: content, results: []};
+  }
+}
+
+async function callGroq(sys, usr, json=true) {
+  const useLocal = await isOllamaAvailable();
+  if (useLocal) {
+    try { return await callOllama(sys, usr, json); }
+    catch { /* fall through to OpenRouter */ }
+  }
+
+  const key = await getConfig('groqKey');
+  if (!key) { openSettings(); throw new Error('Не задан API-ключ OpenRouter'); }
+  const body = {
+    model: 'meta-llama/llama-3.3-70b-instruct:free',
+    messages: [{role:'system', content: sys + (json?'\n\nОтвечай ТОЛЬКО валидным JSON, без обёртки в код-блок.':'')}, {role:'user', content: usr}],
+    temperature: 0.2
+  };
+  const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + key,
+      'HTTP-Referer': 'https://promptkeeper.local',
+      'X-Title': 'PromptKeeper'
+    },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error('OpenRouter ' + r.status + ': ' + await r.text());
+  const j = await r.json();
+  const content = j.choices?.[0]?.message?.content || '';
+  if (!json) return content;
+  try { return JSON.parse(content); }
+  catch {
+    const m = content.match(/\{[\s\S]*\}/);
+    if (m) return JSON.parse(m[0]);
+    throw new Error('Не удалось распарсить ответ ИИ');
+  }
+}
+
+$('#ai-search-prompts').addEventListener('click', async () => {
+  const q = $('#search-prompts').value.trim();
+  if (!q) return toast('Введи запрос', false);
+  const btn = $('#ai-search-prompts'); btn.disabled = true; btn.textContent = 'Анализирую…';
+  try {
+    const items = state.prompts.map((p,i) => ({i, ai:p.ai, text:(p.text||'').slice(0,500), tags:p.tags}));
+    const sys = 'Ищешь релевантные промпты в базе. Верни ТОЛЬКО JSON {"results":[{"i":индекс,"score":0-100,"why":"кратко"}]} — до 15, по убыванию score.';
+    const res = await callGroq(sys, `Запрос: ${q}\n\nПромпты:\n${JSON.stringify(items)}`);
+    state.filtered.prompts = (res.results||[]).map(r => ({...state.prompts[r.i], score:r.score})).filter(Boolean);
+    renderPrompts();
+  } catch(e) { toast(e.message, false); }
+  btn.disabled = false; btn.textContent = 'ИИ-поиск';
+});
+
+$('#ai-search-tools').addEventListener('click', async () => {
+  const q = $('#search-tools').value.trim();
+  if (!q) return toast('Опиши задачу', false);
+  const btn = $('#ai-search-tools'); btn.disabled = true; btn.textContent = '…';
+  try {
+    const items = state.tools.map((t,i) => ({i, name:t.name, desc:t.desc, tags:t.tags}));
+    const sys = 'Подбираешь нейросеть под задачу. Верни ТОЛЬКО JSON {"results":[{"i":индекс,"score":0-100,"why":"кратко почему подходит"}]} — до 7, по убыванию score.';
+    const res = await callGroq(sys, `Задача: ${q}\n\nИнструменты:\n${JSON.stringify(items)}`);
+    state.filtered.tools = (res.results||[]).map(r => ({...state.tools[r.i], score:r.score, why:r.why})).filter(Boolean);
+    renderTools();
+  } catch(e) { toast(e.message, false); }
+  btn.disabled = false; btn.textContent = 'Подобрать нейросеть';
+});
+
+// ===== AI IMPORT =====
+$('#ai-import-btn').addEventListener('click', async () => {
+  const text = $('#import-text').value.trim();
+  if (!text) return toast('Вставь текст', false);
+  const mode = document.querySelector('input[name="ai-mode"]:checked').value;
+  const btn = $('#ai-import-btn'); btn.disabled = true; btn.textContent = 'Анализирую…';
+  $('#ai-import-result').hidden = true;
+  try {
+    const sys = `Извлекай данные из текста. Верни ТОЛЬКО JSON.
+"prompts" → {"prompts":[{"text":"...","ai":"...","tags":["..."]}]}
+"tools" → {"tools":[{"name":"...","url":"только реально из текста","desc":"...","tags":["..."]}]}
+"both" → оба массива.`;
+    const res = await callGroq(sys, `Режим: ${mode}\nТекст:\n"""${text.slice(0,12000)}"""`);
+    let pCnt=0, tCnt=0;
+    if (res.prompts && (mode==='prompts'||mode==='both')) {
+      for (const p of res.prompts) {
+        const e = {id:'imp-'+Date.now()+Math.random().toString(36).slice(2,5), text:p.text, ai:p.ai||'импорт', url:'', tags:p.tags||[], createdAt:new Date().toISOString()};
+        await put('prompts', e); state.prompts.unshift(e); pCnt++;
+      }
+    }
+    if (res.tools && (mode==='tools'||mode==='both')) {
+      for (const t of res.tools) {
+        const e = {id:'imp-'+Date.now()+Math.random().toString(36).slice(2,5), name:t.name, url:t.url||'', desc:t.desc||'', tags:t.tags||[], createdAt:new Date().toISOString()};
+        await put('tools', e); state.tools.unshift(e); tCnt++;
+      }
+    }
+    $('#ai-import-result').hidden = false;
+    $('#ai-import-result').textContent = `Готово. Добавлено: промптов — ${pCnt}, нейросетей — ${tCnt}.\n\n` + JSON.stringify(res, null, 2).slice(0,3000);
+    renderPrompts(); renderTools(); syncToFile();
+    toast(`Готово: +${pCnt} промптов, +${tCnt} нейросетей`);
+  } catch(e) {
+    $('#ai-import-result').hidden = false;
+    $('#ai-import-result').textContent = 'Ошибка: ' + e.message;
+  }
+  btn.disabled = false; btn.textContent = 'Распарсить через ИИ';
+});
+
+// ===== MODALS =====
+function showModal(id) { $('#'+id).classList.add('show'); }
+function hideModal(id) { $('#'+id).classList.remove('show'); }
+$$('[data-close]').forEach(b => b.addEventListener('click', e => e.target.closest('.modal').classList.remove('show')));
+$$('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); }));
+
+function openSettings() {
+  getConfig('groqKey').then(v => { $('#api-key').value = v || ''; });
+  showModal('settings-modal');
+}
+$('#settings-btn').onclick = openSettings;
+$('#save-key').onclick = async () => {
+  await setConfig('groqKey', $('#api-key').value.trim());
+  hideModal('settings-modal'); toast('Ключ сохранён');
+};
+
+function openPromptView(item) {
+  if (!item) return;
+  $('#item-title').textContent = titleFromText(item.text);
+  const tagsHtml = (item.tags||[]).length
+    ? `<div class="tags" style="margin-top:14px">${item.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>` : '';
+  const cleanInitial = item.cleanText || '';
+  $('#item-body').innerHTML = `
+    <div style="color:var(--apple-text-tertiary);font-size:13px;margin-bottom:14px">
+      ${item.ai?esc(item.ai)+' · ':''}${fmtDate(item.createdAt)}
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:13px;font-weight:600;color:var(--apple-text-secondary);text-transform:uppercase;letter-spacing:0.5px">📜 Оригинальное сообщение</div>
+    </div>
+    <div id="v-text" style="background:var(--apple-bg-light-gray);padding:14px;border-radius:12px;
+         max-height:25vh;overflow-y:auto;font-size:14px;line-height:1.55;color:var(--apple-text-primary);
+         white-space:pre-wrap;word-break:break-word;margin-bottom:18px">${linkify(esc(item.text||''))}</div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:13px;font-weight:600;color:var(--apple-link-blue);text-transform:uppercase;letter-spacing:0.5px">✨ Чистый промпт (готов к использованию)</div>
+      <button id="v-copy-clean" class="primary" style="padding:6px 14px;font-size:13px;min-width:auto">📋 Копировать</button>
+    </div>
+    <div id="v-clean-wrap" style="background:#E8F4FF;border:2px solid var(--apple-link-blue);padding:14px;border-radius:12px;
+         max-height:35vh;overflow-y:auto;font-size:14px;line-height:1.55;color:var(--apple-text-primary);
+         white-space:pre-wrap;word-break:break-word;position:relative">
+      <div id="v-clean">${cleanInitial ? linkify(esc(cleanInitial)) : '<span style="color:var(--apple-text-tertiary)">⏳ Извлекаю промпт через ИИ...</span>'}</div>
+    </div>
+
+    ${tagsHtml}
+    <div class="modal-actions">
+      <button class="danger" id="v-del">Удалить</button>
+      <button class="ghost" id="v-edit">Редактировать</button>
+      <button class="ghost" id="v-copy-orig">Копировать оригинал</button>
+      <button class="ghost" id="v-recompute" title="Перегенерировать чистый промпт">🔄 Переочистить</button>
+    </div>`;
+  showModal('item-modal');
+
+  async function doCopy(text, btn, label) {
+    try {
+      await navigator.clipboard.writeText(text||'');
+      const orig = btn.textContent;
+      btn.textContent = '✓ ' + label;
+      btn.style.background = 'var(--apple-accent-green)';
+      btn.style.color = 'white';
+      setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.style.color = ''; }, 1800);
+    } catch (e) { toast('Не удалось скопировать', false); }
+  }
+
+  async function generateClean() {
+    const ollamaOk = await isOllamaAvailable();
+    const key = await getConfig('groqKey');
+    if (!ollamaOk && !key) {
+      $('#v-clean').innerHTML = `<span style="color:var(--apple-accent-red)">⚠ Запустите Ollama или задайте OpenRouter ключ для автоочистки</span>`;
+      return null;
+    }
+    $('#v-clean').innerHTML = '<span style="color:var(--apple-text-tertiary)">⏳ Извлекаю промпт через ИИ...</span>';
+    try {
+      const sys = `Ты извлекаешь из текста ТОЛЬКО сам промпт, готовый к вставке в нейросеть. Убирай: заголовки ("Промпт для X:", описания "Этот промпт делает то-то"), приписки тг-каналов ("Сохраняем себе", "Подписаться", "@channel", "Бэкдор" и т.п.), эмодзи-разделители, рекламу. Сохраняй: всю саму инструкцию для ИИ как есть, переменные [paste...], системные промпты <system_prompt>, примеры. Если в тексте несколько промптов — верни их через двойной перенос строки. Верни ТОЛЬКО JSON {"clean":"чистый текст промпта"}.`;
+      const res = await callGroq(sys, `Текст:\n"""${(item.text||'').slice(0,12000)}"""`);
+      const clean = (res.clean || item.text || '').trim();
+      const updated = {...item, cleanText: clean};
+      await put('prompts', updated);
+      state.prompts = state.prompts.map(p => p.id===item.id ? updated : p);
+      item.cleanText = clean;
+      $('#v-clean').innerHTML = linkify(esc(clean));
+      syncToFile();
+      return clean;
+    } catch(e) {
+      $('#v-clean').innerHTML = `<span style="color:var(--apple-accent-red)">⚠ Ошибка: ${esc(e.message)}</span><div style="margin-top:8px;color:var(--apple-text-secondary)">${linkify(esc(item.text||''))}</div>`;
+      return null;
+    }
+  }
+
+  // Auto-generate clean prompt on open if not already cached
+  if (!cleanInitial) {
+    generateClean();
+  }
+
+  $('#v-copy-clean').onclick = async () => {
+    let text = item.cleanText;
+    if (!text) {
+      $('#v-copy-clean').textContent = '⏳ Чищу...';
+      $('#v-copy-clean').disabled = true;
+      text = await generateClean();
+      $('#v-copy-clean').disabled = false;
+      $('#v-copy-clean').textContent = '📋 Копировать';
+    }
+    if (text) doCopy(text, $('#v-copy-clean'), 'Скопирован');
+  };
+  $('#v-copy-orig').onclick = () => doCopy(item.text||'', $('#v-copy-orig'), 'Оригинал скопирован');
+  $('#v-recompute').onclick = async () => {
+    item.cleanText = '';
+    await put('prompts', {...item, cleanText: ''});
+    await generateClean();
+  };
+  $('#v-edit').onclick = () => { hideModal('item-modal'); setTimeout(() => openPromptModal(item), 50); };
+  $('#v-del').onclick = async () => {
+    if (!confirm('Удалить?')) return;
+    await del('prompts', item.id);
+    state.prompts = state.prompts.filter(p => p.id !== item.id);
+    if (state.filtered.prompts) state.filtered.prompts = state.filtered.prompts.filter(p => p.id !== item.id);
+    hideModal('item-modal'); renderPrompts(); syncToFile(); toast('Удалено');
+  };
+}
+
+function openPromptModal(item) {
+  const isNew = !item;
+  $('#item-title').textContent = isNew ? 'Новый промпт' : 'Промпт';
+  $('#item-body').innerHTML = `
+    <label>Текст промпта</label><textarea id="m-text" rows="7">${esc(item?.text||'')}</textarea>
+    <label>Нейросеть / источник</label><input type="text" id="m-ai" value="${esc(item?.ai||'')}">
+    <label>URL</label><input type="url" id="m-url" value="${esc(item?.url||'')}">
+    <label>Теги (через запятую)</label><input type="text" id="m-tags" value="${esc((item?.tags||[]).join(', '))}">
+    <div class="modal-actions">
+      ${isNew?'':'<button class="danger" id="m-del">Удалить</button>'}
+      <button class="ghost" id="m-copy">Копировать</button>
+      <button class="primary" id="m-save">${isNew?'Сохранить':'Обновить'}</button>
+    </div>`;
+  showModal('item-modal');
+  $('#m-save').onclick = async () => {
+    const text = $('#m-text').value.trim(); if (!text) return;
+    const e = {
+      id: item?.id || 'm-'+Date.now(),
+      text, ai: $('#m-ai').value.trim()||'manual', url: $('#m-url').value.trim(),
+      tags: $('#m-tags').value.split(',').map(s=>s.trim()).filter(Boolean),
+      createdAt: item?.createdAt || new Date().toISOString()
+    };
+    await put('prompts', e);
+    if (isNew) state.prompts.unshift(e);
+    else state.prompts = state.prompts.map(p => p.id===item.id ? e : p);
+    hideModal('item-modal'); renderPrompts(); syncToFile(); toast('Сохранено');
+  };
+  $('#m-copy').onclick = () => { navigator.clipboard.writeText($('#m-text').value); toast('В буфер'); };
+  if (!isNew) $('#m-del').onclick = async () => {
+    if (!confirm('Удалить?')) return;
+    await del('prompts', item.id);
+    state.prompts = state.prompts.filter(p => p.id !== item.id);
+    hideModal('item-modal'); renderPrompts(); syncToFile(); toast('Удалено');
+  };
+}
+function openToolModal(item) {
+  const isNew = !item;
+  $('#item-title').textContent = isNew ? 'Новая нейросеть' : 'Нейросеть';
+  $('#item-body').innerHTML = `
+    <label>Название</label><input type="text" id="m-name" value="${esc(item?.name||'')}">
+    <label>URL</label><input type="url" id="m-url" value="${esc(item?.url||'')}">
+    <label>Описание</label><textarea id="m-desc" rows="3">${esc(item?.desc||'')}</textarea>
+    <label>Теги</label><input type="text" id="m-tags" value="${esc((item?.tags||[]).join(', '))}">
+    <div class="modal-actions">
+      ${isNew?'':'<button class="danger" id="m-del">Удалить</button>'}
+      ${item?.url?'<button class="ghost" id="m-open">Открыть</button>':''}
+      <button class="primary" id="m-save">${isNew?'Сохранить':'Обновить'}</button>
+    </div>`;
+  showModal('item-modal');
+  $('#m-save').onclick = async () => {
+    const name = $('#m-name').value.trim(); if (!name) return;
+    const e = {
+      id: item?.id || 't-'+Date.now(),
+      name, url: $('#m-url').value.trim(), desc: $('#m-desc').value.trim(),
+      tags: $('#m-tags').value.split(',').map(s=>s.trim()).filter(Boolean),
+      createdAt: item?.createdAt || new Date().toISOString()
+    };
+    await put('tools', e);
+    if (isNew) state.tools.unshift(e);
+    else state.tools = state.tools.map(t => t.id===item.id ? e : t);
+    hideModal('item-modal'); renderTools(); syncToFile(); toast('Сохранено');
+  };
+  if (item?.url && $('#m-open')) $('#m-open').onclick = () => window.open(item.url, '_blank');
+  if (!isNew) $('#m-del').onclick = async () => {
+    if (!confirm('Удалить?')) return;
+    await del('tools', item.id);
+    state.tools = state.tools.filter(t => t.id !== item.id);
+    hideModal('item-modal'); renderTools(); syncToFile(); toast('Удалено');
+  };
+}
+
+$('#add-prompt').onclick = () => openPromptModal(null);
+$('#add-tool').onclick = () => openToolModal(null);
+
+// ===== SEED =====
+$('#seed-tools').onclick = async () => {
+  if (state.tools.length && !confirm('В базе уже есть нейросети. Добавить ещё из стартового списка?')) return;
+  try {
+    const r = await fetch('../extension/data/ai-tools.json');
+    if (!r.ok) throw new Error('Не найден файл ../extension/data/ai-tools.json. Открывай webapp/index.html из той же папки PromptKeeper.');
+    const list = await r.json();
+    let added = 0;
+    for (const t of list) {
+      const e = {id:'seed-'+added+'-'+Date.now(), ...t, createdAt:new Date().toISOString()};
+      await put('tools', e); state.tools.unshift(e); added++;
+    }
+    renderTools(); syncToFile(); toast(`+${added} нейросетей`);
+  } catch(e) { toast(e.message, false); }
+};
+
+// ===== EXPORT / IMPORT =====
+$('#export-btn').onclick = () => {
+  const blob = new Blob([JSON.stringify({prompts:state.prompts, tools:state.tools, exportedAt:new Date().toISOString()}, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `promptkeeper-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+};
+$('#import-btn').onclick = () => $('#import-file').click();
+$('#import-file').onchange = async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const j = JSON.parse(await f.text());
+    let p=0, t=0;
+    const mkId = (pref) => pref + '-' + Date.now() + '-' + Math.random().toString(36).slice(2,7);
+    if (Array.isArray(j.prompts)) for (const x of j.prompts) {
+      const obj = {...x, id: x.id || mkId('imp-p'), createdAt: x.createdAt || new Date().toISOString()};
+      await put('prompts', obj); p++;
+    }
+    if (Array.isArray(j.tools)) for (const x of j.tools) {
+      const obj = {...x, id: x.id || mkId('imp-t'), createdAt: x.createdAt || new Date().toISOString()};
+      await put('tools', obj); t++;
+    }
+    state.prompts = await getAll('prompts');
+    state.tools   = await getAll('tools');
+    state.prompts.sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+    renderPrompts(); renderTools(); syncToFile();
+    toast(`+${p} промптов, +${t} нейросетей`);
+  } catch(err) { toast(err.message, false); }
+};
+
+// ===== FILE BINDING (auto-sync to JSON file) =====
+async function bindFile() {
+  if (!window.showSaveFilePicker) {
+    toast('Браузер не поддерживает File System Access API. Используй Экспорт/Импорт.', false);
+    return;
+  }
+  try {
+    fileHandle = await window.showSaveFilePicker({
+      suggestedName: 'promptkeeper.json',
+      types: [{description:'PromptKeeper JSON', accept:{'application/json':['.json']}}]
+    });
+    await setConfig('fileHandle', fileHandle);
+    await setConfig('fileName', fileHandle.name);
+    updateFileStatus();
+    await syncToFile();
+    toast('База привязана к файлу. Изменения сохраняются автоматически.');
+  } catch(e) {
+    if (e.name !== 'AbortError') toast(e.message, false);
+  }
+}
+async function syncToFile() {
+  if (!fileHandle) return;
+  try {
+    const perm = await fileHandle.queryPermission({mode:'readwrite'});
+    if (perm !== 'granted') {
+      const r = await fileHandle.requestPermission({mode:'readwrite'});
+      if (r !== 'granted') { toast('Нет доступа к файлу', false); return; }
+    }
+    const w = await fileHandle.createWritable();
+    await w.write(JSON.stringify({prompts:state.prompts, tools:state.tools, savedAt:new Date().toISOString()}, null, 2));
+    await w.close();
+  } catch(e) {
+    toast('Ошибка автосохранения: ' + e.message, false);
+  }
+}
+async function unbindFile() {
+  fileHandle = null;
+  await setConfig('fileHandle', null);
+  await setConfig('fileName', null);
+  updateFileStatus();
+  toast('Файл отвязан');
+}
+function updateFileStatus() {
+  const s = $('#file-status');
+  const btn = $('#bind-file-btn');
+  if (fileHandle) {
+    s.textContent = '🔗 ' + (fileHandle.name || 'файл');
+    s.classList.add('linked');
+    btn.classList.add('linked');
+    btn.textContent = 'Файл привязан';
+  } else {
+    s.textContent = '';
+    s.classList.remove('linked');
+    btn.classList.remove('linked');
+    btn.textContent = 'Связать с файлом';
+  }
+}
+$('#bind-file-btn').onclick = bindFile;
+$('#bind-file-btn-2').onclick = bindFile;
+$('#reload-base-btn').onclick = forceReloadBaseData;
+$('#unbind-file-btn').onclick = unbindFile;
+
+// ===== AUTO-IMPORT TG BATCH (one-time) =====
+async function autoImportTg() {
+  if (await getConfig('autoImportedTg_v3')) return;
+  let j = null;
+  // Try fetch first (works on http://)
+  try {
+    const r = await fetch('imported.json');
+    if (r.ok) j = await r.json();
+  } catch(e) { /* fall through to bundled data */ }
+  // Fallback to bundled data (works on file://)
+  if (!j && window.PROMPTKEEPER_BUNDLED_DATA) {
+    j = window.PROMPTKEEPER_BUNDLED_DATA;
+  }
+  if (!j) return;
+
+  let p=0, t=0;
+  if (Array.isArray(j.prompts)) for (const x of j.prompts) {
+    const e = {id:'tg-'+p+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,7), createdAt:new Date().toISOString(), ...x};
+    await put('prompts', e); p++;
+  }
+  if (Array.isArray(j.tools)) for (const x of j.tools) {
+    const e = {id:'tg-t-'+t+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,7), createdAt:new Date().toISOString(), ...x};
+    await put('tools', e); t++;
+  }
+  await setConfig('autoImportedTg_v3', true);
+  if (p+t > 0) toast(`Загружена база: +${p} промптов, +${t} нейросетей`);
+}
+
+async function forceReloadBaseData() {
+  if (!confirm('Перезагрузить базу промптов и нейросетей? Существующие данные останутся, добавятся пропавшие.')) return;
+  await setConfig('autoImportedTg_v3', false);
+  await autoImportTg();
+  state.prompts = (await getAll('prompts')).sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+  state.tools = (await getAll('tools')).sort((a,b) => (a.name||'').localeCompare(b.name||''));
+  renderPrompts(); renderTools();
+}
+
+// ===== OLLAMA AUTO-CHECK =====
+async function checkOllamaStatus(retries = 0, maxRetries = 5) {
+  try {
+    const r = await fetch('http://localhost:11434/api/tags', {method:'GET'});
+    if (r.ok) return true;
+  } catch {
+    if (retries < maxRetries) {
+      await new Promise(r => setTimeout(r, 1000));
+      return checkOllamaStatus(retries + 1, maxRetries);
+    }
+  }
+  return false;
+}
+
+async function setupOllamaNotification() {
+  const statusEl = document.createElement('div');
+  statusEl.id = 'ollama-status';
+  statusEl.style.cssText = `
+    position: fixed; bottom: 20px; right: 20px; z-index: 999;
+    padding: 12px 16px; border-radius: 10px; font-size: 13px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease;
+    max-width: 300px;
+  `;
+
+  // Show checking status first
+  statusEl.style.background = '#666';
+  statusEl.style.color = 'white';
+  statusEl.textContent = '⏳ Проверяю Ollama...';
+  document.body.appendChild(statusEl);
+
+  const isAvailable = await checkOllamaStatus();
+
+  if (isAvailable) {
+    statusEl.style.background = '#2D8C3C';
+    statusEl.textContent = '✓ Ollama готова (быстрый ИИ)';
+    statusEl.style.opacity = '0.8';
+    // Auto-hide after 2 seconds
+    setTimeout(() => {
+      statusEl.style.opacity = '0';
+      statusEl.style.transition = 'opacity 0.3s ease';
+      setTimeout(() => statusEl.remove(), 300);
+    }, 2000);
+  } else {
+    statusEl.style.background = '#E30000';
+    statusEl.textContent = '⚠ Ollama не запущена';
+    statusEl.innerHTML = `
+      <strong>⚠ Ollama не найдена</strong><br>
+      <small style="opacity:0.9;display:block;margin-top:6px">
+        Запустите: <code style="background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px">launch-promptkeeper.ps1</code><br>
+        или используется облачный ИИ (медленнее)
+      </small>
+    `;
+    statusEl.style.padding = '12px 16px';
+  }
+}
+
+// ===== INIT =====
+(async () => {
+  db = await openDB();
+  await autoImportTg();
+  state.prompts = (await getAll('prompts')).sort((a,b) => (b.createdAt||'').localeCompare(a.createdAt||''));
+  state.tools   = (await getAll('tools')).sort((a,b)   => (a.name||'').localeCompare(b.name||''));
+
+  // Restore file handle
+  try {
+    fileHandle = await getConfig('fileHandle');
+    if (fileHandle) {
+      const perm = await fileHandle.queryPermission({mode:'readwrite'});
+      if (perm === 'granted') updateFileStatus();
+      else {
+        // user must click to re-grant
+        $('#file-status').textContent = '⚠ Нажми «Файл привязан» чтобы подтвердить доступ';
+        $('#bind-file-btn').textContent = 'Подтвердить файл';
+        $('#bind-file-btn').onclick = async () => {
+          const r = await fileHandle.requestPermission({mode:'readwrite'});
+          if (r === 'granted') { updateFileStatus(); $('#bind-file-btn').onclick = bindFile; }
+        };
+      }
+    }
+  } catch {}
+
+  renderPrompts(); renderTools();
+  setupOllamaNotification();
+})();
+</script>
+</body>
+</html>

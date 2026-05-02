@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "PromptKeeper",
+  "version": "1.1.0",
+  "description": "Сохраняй промпты из любых нейросетей одной кнопкой. ИИ-поиск по базе.",
+  "permissions": ["storage", "activeTab", "scripting", "contextMenus", "downloads"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "PromptKeeper",
+    "default_icon": {"16":"icons/icon16.png","48":"icons/icon48.png","128":"icons/icon128.png"}
+  },
+  "icons": {"16":"icons/icon16.png","48":"icons/icon48.png","128":"icons/icon128.png"},
+  "background": {"service_worker": "background.js"},
+  "content_scripts": [{
+    "matches": [
+      "*://chatgpt.com/*","*://chat.openai.com/*","*://claude.ai/*",
+      "*://gemini.google.com/*","*://aistudio.google.com/*","*://chat.mistral.ai/*",
+      "*://grok.com/*","*://chat.qwenlm.ai/*","*://chat.deepseek.com/*",
+      "*://yiyan.baidu.com/*","*://you.com/*","*://perplexity.ai/*","*://*.perplexity.ai/*",
+      "*://poe.com/*","*://copilot.microsoft.com/*","*://huggingface.co/chat/*"
+    ],
+    "js": ["content.js"],
+    "css": ["content.css"],
+    "run_at": "document_idle"
+  }],
+  "options_page": "options.html",
+  "web_accessible_resources": [{"resources":["data/ai-tools.json","data/imported.json"],"matches":["<all_urls>"]}]
+}

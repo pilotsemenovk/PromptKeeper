@@ -1,0 +1,24 @@
+#pk-save-btn {
+  position: fixed; bottom: 24px; right: 24px; z-index: 2147483647;
+  background: #1D1D1F; color: #fff; border: 0;
+  border-radius: 980px; padding: 12px 22px;
+  font: 500 14px/1 'SF Pro Text','Helvetica Neue','Inter',-apple-system,system-ui,sans-serif;
+  letter-spacing: -0.01em; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.12), 0 8px 24px rgba(0,0,0,.18);
+  transition: transform .2s, box-shadow .2s, background .2s;
+  user-select: none; -webkit-font-smoothing: antialiased;
+}
+#pk-save-btn:hover { background: #000; transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.16), 0 12px 32px rgba(0,0,0,.24); }
+#pk-save-btn:active { transform: translateY(0); }
+#pk-save-btn.saved { background: #2D8C3C; }
+
+#pk-toast {
+  position: fixed; bottom: 84px; right: 24px; z-index: 2147483647;
+  background: #1D1D1F; color: #fff; padding: 12px 20px;
+  border-radius: 980px;
+  font: 500 13px/1.4 'SF Pro Text','Helvetica Neue','Inter',-apple-system,system-ui,sans-serif;
+  letter-spacing: -0.01em;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  max-width: 320px; -webkit-font-smoothing: antialiased;
+}

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>PromptKeeper — настройки</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --apple-bg-white: #FFFFFF;
+  --apple-bg-light-gray: #F5F5F7;
+  --apple-bg-elevated: #FBFBFD;
+  --apple-text-primary: #1D1D1F;
+  --apple-text-secondary: #6E6E73;
+  --apple-link-blue: #0066CC;
+  --apple-link-blue-hover: #0077ED;
+  --apple-font-display: 'SF Pro Display','Inter','Helvetica Neue','Arial',sans-serif;
+  --apple-font-text: 'SF Pro Text','Inter','Helvetica Neue','Arial',sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  font: 17px/1.53 var(--apple-font-text);
+  max-width: 720px; margin: 0 auto;
+  padding: 60px 24px 80px;
+  background: var(--apple-bg-elevated);
+  color: var(--apple-text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+h1 {
+  font-family: var(--apple-font-display);
+  font-size: 48px; font-weight: 700;
+  letter-spacing: -0.02em; line-height: 1.05;
+  margin: 0 0 8px;
+}
+.subtitle { font-size: 21px; color: var(--apple-text-secondary); margin: 0 0 48px; line-height: 1.4; }
+h2 {
+  font-family: var(--apple-font-display);
+  font-size: 28px; font-weight: 600;
+  letter-spacing: -0.015em; line-height: 1.1;
+  margin: 40px 0 16px;
+}
+.step {
+  background: var(--apple-bg-white); padding: 28px;
+  border-radius: 18px; margin: 16px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+}
+.step p { margin: 0 0 12px; }
+.step .label {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--apple-link-blue); margin-bottom: 6px; display: block;
+}
+input[type=password] {
+  width: 100%; padding: 13px 18px; border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.12);
+  background: var(--apple-bg-white); color: var(--apple-text-primary);
+  font: 15px var(--apple-font-text);
+  margin: 8px 0 14px;
+}
+input:focus { outline: 0; border-color: var(--apple-link-blue); box-shadow: 0 0 0 3px rgba(0,102,204,.15); }
+button {
+  background: var(--apple-link-blue); color: #fff; border: 0;
+  padding: 12px 26px; border-radius: 980px; cursor: pointer;
+  font: 500 15px var(--apple-font-text);
+}
+button:hover { background: var(--apple-link-blue-hover); }
+.ok { color: #2D8C3C; font-weight: 500; margin-left: 12px; }
+a { color: var(--apple-link-blue); text-decoration: none; font-weight: 500; }
+a:hover { text-decoration: underline; }
+code {
+  background: var(--apple-bg-light-gray);
+  padding: 2px 8px; border-radius: 6px;
+  font: 14px 'SF Mono', ui-monospace, Menlo, monospace;
+}
+.note { color: var(--apple-text-secondary); font-size: 14px; line-height: 1.5; margin-top: 24px; }
+</style>
+</head>
+<body>
+
+<h1>Настройки.</h1>
+<p class="subtitle">Подключи ИИ за минуту. Бесплатно.</p>
+
+<h2>Подключение ИИ</h2>
+<div class="step">
+  <span class="label">Шаг 1</span>
+  <p>Перейди на <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a> и войди через Google. Карта не нужна, работает в любом регионе.</p>
+</div>
+<div class="step">
+  <span class="label">Шаг 2</span>
+  <p>Нажми «Create Key», задай любое имя, скопируй ключ — он начинается с <code>sk-or-v1-...</code></p>
+</div>
+<div class="step">
+  <span class="label">Шаг 3</span>
+  <p>Вставь ключ сюда:</p>
+  <input id="key" type="password" placeholder="sk-or-v1-...">
+  <button id="save">Сохранить</button>
+  <span id="status"></span>
+</div>
+
+<p class="note">
+Используется бесплатная модель <code>meta-llama/llama-3.3-70b-instruct:free</code> — отлично с русским, лимиты щедрые. Ключ хранится только локально и отправляется только на openrouter.ai.
+</p>
+
+<script>
+  const $ = s => document.querySelector(s);
+  chrome.storage.local.get('pk_groq_key', o => { $('#key').value = o.pk_groq_key || ''; });
+  $('#save').onclick = async () => {
+    await chrome.storage.local.set({pk_groq_key: $('#key').value.trim()});
+    $('#status').textContent = '✓ сохранено';
+    $('#status').className = 'ok';
+    setTimeout(() => $('#status').textContent = '', 2400);
+  };
+</script>
+</body>
+</html>
